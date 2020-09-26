@@ -40,6 +40,7 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
         "symfony/browser-kit": "^5.1",
         "symfony/css-selector": "^5.1",
         "symfony/debug-bundle": "^5.1",
@@ -76,6 +77,12 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
+        "prepare" : [
+            "symfony console doctrine:database:drop  --if-exists -f",
+            "symfony console doctrine:database:create",
+            "symfony console doctrine:schema:update -f",
+            "symfony console doctrine:fixtures:load -n"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
