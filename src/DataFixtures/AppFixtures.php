@@ -37,7 +37,7 @@ class AppFixtures extends Fixture
             );
             for ($j = random_int(1, 3); $j <= 3; $j++) {
                 $user = User::create(
-                    "username" . $j,
+                    "user" . $j . "c" . $i,
                     "user.email" . $j . "@mail.com"
                 );
                 $manager->persist($user);
