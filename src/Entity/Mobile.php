@@ -15,6 +15,15 @@ use Hateoas\Configuration\Annotation as Hateoas;
 /**
  * 
  * @ORM\Entity(repositoryClass=MobileRepository::class)
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *            "api_get_one_mobile",
+ *            parameters = { "id" = "expr(object.getId())" },
+ *            absolute=true
+ *      )
+ * 
+ * )
  * @ExclusionPolicy("all")
  * 
  */

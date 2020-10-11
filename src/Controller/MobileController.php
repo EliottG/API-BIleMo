@@ -30,34 +30,90 @@ class MobileController extends AbstractController
         $this->serializer = $serializer;
     }
     /**
+     * Get all mobiles
      * @Route("/mobiles", name="api_get_all_mobiles", methods = {"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Mobile::class))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found",
+     * )
+     * @SWG\Tag(name="Mobile")
+     * @nSecurity(name="Bearer")
      * 
      * @return JsonResponse
      */
-    public function getAllMobiles(MobileRepository $mobileRepository)
+    public function getAllMobiles(MobileRepository $mobileRepository, Request $request)
     {
         
         $mobiles = $this->serializer->serialize($mobileRepository->findAll(), 'json');
 
-
-        return new JsonResponse(
+        
+        $response = new JsonResponse(
             $mobiles,
-            JsonResponse::HTTP_OK,
+            200,
             [],
             true
         );
+        //dd($response);
+       // $response->setEtag(md5($mobiles));
+        $response->setPublic();
+        $response->setMaxAge(3600);
+        $response->setVary(['authorization']);
+        // $response->isNotModified($request);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+
+        return $response;
     }
     /** 
      * @Route("/mobile/{id}", name= "api_get_one_mobile", methods = {"GET"})
+     *  * @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Mobile::class))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found",
+     * )
+     * @SWG\Response(
+     *     response=404,
+     *     description="NOT FOUND",
+     * )
+     * @SWG\Parameter(
+     *    name="id",
+     *    in="path",
+     *    type="integer",
+     *    description ="ID of the mobile",
+     *    required=true
+     * )
+     * @SWG\Tag(name="Mobile")
+     * @nSecurity(name="Bearer")
      * @return JsonResponse
      */
-    public function getOneMobile(Mobile $mobile, MobileRepository $mobileRepository)
+    public function getOneMobile(Mobile $mobile, Request $request)
     {
-        return new JsonResponse(
+        $response =  new JsonResponse(
             $this->serializer->serialize($mobile, 'json'),
             JsonResponse::HTTP_OK,
             [],
             true
         );
+        $response->setEtag(md5($response->getContent()));
+        $response->setPublic();
+        $response->setMaxAge(3600);
+        $response->isNotModified($request);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+
+        return $response;
     }
 }

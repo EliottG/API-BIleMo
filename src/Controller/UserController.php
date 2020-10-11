@@ -30,7 +30,23 @@ class UserController extends AbstractController
         $this->serializer = $serializer;
     }
     /**
+     * Get all users linked to a client
      * @Route("/users", name="api_get_all_users" , methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found",
+     * )
+     * @SWG\Tag(name="User")
+     * @nSecurity(name="Bearer")
+     * 
      * @return JsonResponse
      */
     public function getAllUsers(UserRepository $userRepository, ClientRepository $clientRepository)
@@ -45,7 +61,31 @@ class UserController extends AbstractController
         );
     }
     /**
+     * Get one specified user linked to a client
      * @Route("/user/{id}", name="api_get_one_user", methods={"GET"})
+     * @IsGranted("USER_SHOW", subject="user")
+     * @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     *  @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found",
+     * )
+     * @SWG\Parameter(
+     *    name="id",
+     *    in="path",
+     *    type="integer",
+     *    description ="ID of the user",
+     *    required=true
+     * )
+     * @SWG\Tag(name="User")
+     * @nSecurity(name="Bearer")
+     * 
      * @return JsonResponse
      */
     public function getOneUser(User $user)
@@ -74,8 +114,13 @@ class UserController extends AbstractController
      * )
      * @SWG\Response(
      *     response=401,
-     *     description="UNAUTHORIZED - JWT Token not found",
+     *     description="JWT Token not found",
      * )
+     * @SWG\Response(
+     *     response=404,
+     *     description="NOT FOUND"
+     * )
+     * 
      * @nSecurity(name="Bearer")
      * @SWG\Tag(name="User")
      * @return JsonResponse
@@ -106,7 +151,7 @@ class UserController extends AbstractController
      * )
      * @SWG\Response(
      *     response=401,
-     *     description="UNAUTHORIZED - JWT Token not found",
+     *     description="JWT Token not found",
      * )
      *      @SWG\Response(
      *     response=404,
@@ -121,6 +166,7 @@ class UserController extends AbstractController
      * )
      * @SWG\Tag(name="User")
      * @IsGranted("USER_DELETE", subject="user")
+     * @nSecurity(name="Bearer")
      */
     public function deleteUser(User $user)
     {
