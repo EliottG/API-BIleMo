@@ -20,7 +20,7 @@ class SecurityController
      *   @SWG\Schema(
      *     type="object",
      *     title="Login field",
-     *     @SWG\Property(property="username", type="string", default="email1@mail.com"),
+     *     @SWG\Property(property="username", type="string", default="Client1"),
      *     @SWG\Property(property="password", type="string", default="password")
      *  
      *     )
