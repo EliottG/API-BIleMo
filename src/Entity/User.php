@@ -14,6 +14,32 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ *   @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *            "api_get_one_user",
+ *            parameters = { "id" = "expr(object.getId())" },
+ *            absolute=true
+ *      )
+ * 
+ * )
+ * 
+ * )
+ *   @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *            "api_delete_user",
+ *            parameters = { "id" = "expr(object.getId())" },
+ *            absolute=true
+ *      )
+ * 
+ * )
+ *   @Hateoas\Relation(
+ *      "Client",
+ *      embedded = @Hateoas\Embedded("expr(object.getClient())")
+ * )
+ * 
+ * )
  * @ExclusionPolicy("all")
  */
 class User
