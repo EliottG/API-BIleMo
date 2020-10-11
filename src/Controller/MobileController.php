@@ -72,6 +72,7 @@ class MobileController extends AbstractController
         return $response;
     }
     /** 
+     * Get one specified mobile
      * @Route("/mobile/{id}", name= "api_get_one_mobile", methods = {"GET"})
      *  * @SWG\Response(
      *     response=200,
