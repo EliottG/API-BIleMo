@@ -6,7 +6,7 @@ security:
         doctrine:
             entity:
                 class: App\Entity\Client
-                property: email
+                property: name
     firewalls:
         api_doc:
             pattern: ^/api/doc
