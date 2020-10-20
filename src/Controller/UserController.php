@@ -16,11 +16,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Security as nSecurity;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
+use App\Service\RequestValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Validator\Constraints\Form as ConstraintsForm;
 use Symfony\Component\HttpFoundation\Response;
+use Nelmio\ApiDocBundle\Annotation\Model;
 
 class UserController extends AbstractController
 {
@@ -51,7 +50,7 @@ class UserController extends AbstractController
      */
     public function getAllUsers(UserRepository $userRepository, ClientRepository $clientRepository)
     {
-        $client = $clientRepository->find($this->getUser());   
+        $client = $clientRepository->find($this->getUser());
         $users = $this->serializer->serialize($userRepository->findAllFromClient($client), 'json');
         return new JsonResponse(
             $users,
@@ -120,15 +119,21 @@ class UserController extends AbstractController
      *     response=404,
      *     description="NOT FOUND"
      * )
-     * 
      * @nSecurity(name="Bearer")
      * @SWG\Tag(name="User")
      * @return JsonResponse
      */
-    public function createUser(Request $request)
+    public function createUser(Request $request, RequestValidator $validator)
     {
-        
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        try{            
+        $user = $validator->validateRequest($request, User::class);
+        }catch(\Exception $e){            
+            return new JsonResponse(
+                ['errors' => json_decode($e->getMessage())],
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
+
         $user->setClient($this->getUser());
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
@@ -141,7 +146,7 @@ class UserController extends AbstractController
             true
         );
     }
-    
+
     /**
      * Delete a user
      * @Route("/user/{id}", name="api_delete_user", methods={"DELETE"}) 

@@ -112,6 +112,7 @@ class MobileController extends AbstractController
         $response->setEtag(md5($response->getContent()));
         $response->setPublic();
         $response->setMaxAge(3600);
+        $response->setVary(['authorization']);
         $response->isNotModified($request);
         $response->headers->addCacheControlDirective('must-revalidate', true);
 

@@ -81,7 +81,7 @@
     },
     "scripts": {
         "prepare" : [
-            "symfony console doctrine:database:drop  --if-exists -f",
+            "symfony console doctrine:database:drop -f",
             "symfony console doctrine:database:create",
             "symfony console doctrine:schema:update -f",
             "symfony console doctrine:fixtures:load -n"
