@@ -5,21 +5,23 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Client;
 use App\Form\UserType;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Form\Form;
+use App\Service\RequestValidator;
 use App\Repository\UserRepository;
 use App\Repository\ClientRepository;
 use JMS\Serializer\SerializerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Swagger\Annotations as SWG;
+use Hateoas\Representation\PaginatedRepresentation;
+use Hateoas\Representation\CollectionRepresentation;
 use Nelmio\ApiDocBundle\Annotation\Security as nSecurity;
-use App\Service\RequestValidator;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Nelmio\ApiDocBundle\Annotation\Model;
 
 class UserController extends AbstractController
 {
@@ -48,12 +50,26 @@ class UserController extends AbstractController
      * 
      * @return JsonResponse
      */
-    public function getAllUsers(UserRepository $userRepository, ClientRepository $clientRepository)
+    public function getAllUsers(UserRepository $userRepository, ClientRepository $clientRepository, Request $request)
     {
         $client = $clientRepository->find($this->getUser());
-        $users = $this->serializer->serialize($userRepository->findAllFromClient($client), 'json');
+        $page = $request->query->get('page',1);
+        $limit = $request->query->get('limit', 5);
+        $users = $userRepository->findAllFromClient($client);
+        $offset = ($page - 1) * $limit;
+        $numberOfPages = (int) ceil(count($users) / $limit);
+        $collection = new CollectionRepresentation(
+            array_slice($users, $offset, $limit));
+        $paginated = new PaginatedRepresentation(
+            $collection,
+            'api_get_all_users',
+            [],
+            $page,
+            $limit,
+            $numberOfPages
+        );
         return new JsonResponse(
-            $users,
+            $this->serializer->serialize($paginated, 'json'),
             200,
             [],
             true

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Mobile;
 use App\Repository\MobileRepository;
+use Hateoas\Representation\CollectionRepresentation;
+use Hateoas\Representation\PaginatedRepresentation;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -51,12 +53,24 @@ class MobileController extends AbstractController
      */
     public function getAllMobiles(MobileRepository $mobileRepository, Request $request)
     {
-        
-        $mobiles = $this->serializer->serialize($mobileRepository->findAll(), 'json');
-
-        
+        $page = $request->query->get('page', 1);
+        $mobiles = $mobileRepository->findAll();
+        $limit = $request->query->get('limit', 5);
+        $page = $request->query->get('page', 1);
+        $offset = ($page - 1) * $limit;
+        $numberOfPages = (int) ceil(count($mobiles) / $limit);
+        $collection = new CollectionRepresentation(
+            array_slice($mobiles, $offset, $limit));
+        $paginated = new PaginatedRepresentation(
+            $collection,
+            'api_get_all_mobiles',
+            [],
+            $page,
+            $limit,
+            $numberOfPages
+        );
         $response = new JsonResponse(
-            $mobiles,
+            $this->serializer->serialize($paginated, 'json'),
             200,
             [],
             true

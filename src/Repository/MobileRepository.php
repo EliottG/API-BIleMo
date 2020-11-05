@@ -14,27 +14,25 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MobileRepository extends ServiceEntityRepository
 {
+
+const MOBILE_PER_PAGE = 5;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mobile::class);
     }
 
-    // /**
-    //  * @return Mobile[] Returns an array of Mobile objects
-    //  */
-    /*
-    public function findByExampleField($value)
+
+    public function getMobilePage($page)
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
             ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
+            ->setMaxResults(self::MOBILE_PER_PAGE)
+            ->setFirstResult(($page-1)* self::MOBILE_PER_PAGE)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Mobile
